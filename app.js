@@ -7,6 +7,11 @@
   * Keychain key for AnkiConnect URL.
   */
  const ANKICONNECT_URL_KEY = "anki.widget.ankiconnect.url";
+
+ /**
+  * Keychain key for last succesful data.
+  */
+ const STORAGE_KEY = "anki.widget.ankiconnect.data";
  
  /**
   * Colour scheme for the graph.
@@ -229,11 +234,11 @@
        // Transform response.result into an array of objects with scalar reviews
        return response.result.map(([date, reviews]) => ({
          date,
-         reviews: reviews || 0, // Default to 0 if reviews is undefined
+         reviews: reviews || 0,
        }));
      } catch (error) {
-       console.error("Failed to fetch data from AnkiConnect:", error);
-       return [];
+       console.error("Failed to fetch data from AnkiConnect:")
+       console.error(error);
      }
    }
    
@@ -245,7 +250,6 @@
  * @returns {Object} - A dictionary with dates as keys and review counts as values.
  */
  async function fetchAndFormatReviews() {
-  const STORAGE_KEY = "anki.widget.lastSuccess"; // Key for storing data in Keychain
   const today = new Date();
   const startDate = subDays(today, 7 * 17); // Start date 17 weeks ago
 
@@ -268,15 +272,15 @@
 
     return calendar;
   } catch (error) {
-    console.error("Failed to fetch and format reviews:", error);
 
     // Fallback to the last successfully stored data in Keychain
     if (Keychain.contains(STORAGE_KEY)) {
-      console.warn("Using fallback data from Keychain.");
+      console.log("Using fallback data from Keychain.");
       return JSON.parse(Keychain.get(STORAGE_KEY));
     }
 
     // Return an empty calendar object if no fallback is available
+    console.error("Fetch failed and no fallback data stored")
     return {};
   }
 }
